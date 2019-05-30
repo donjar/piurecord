@@ -16,6 +16,6 @@ get '/:difficulty' do |difficulty|
 end
 
 get '/:difficulty/:song_id/:result' do |difficulty, song_id, result|
-  insert_result(song_id.to_i, result.to_i)
+  insert_result(song_id.to_i, result.to_i, difficulty)
   redirect to("/#{difficulty}")
 end
