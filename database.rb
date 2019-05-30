@@ -5,7 +5,11 @@ $result_map = ['nil', 'F', 'D', 'C', 'B', 'A', 'Pass', 'S', 'SS', 'SSS']
 
 $table_name = :record
 
-$DB = Sequel.postgres('piurecord', user: 'postgres', password: 'password', host: 'localhost')
+$DB = if ENV['RACK_ENV'] == 'production'
+        Sequel.connect(ENV['DATABASE_URL'])
+      else
+        Sequel.postgres('piurecord', user: 'postgres', password: 'password', host: 'localhost')
+      end
 $DB.create_table $table_name do
   primary_key :song_id
   Integer :result, null: false
