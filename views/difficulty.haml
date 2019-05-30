@@ -1,0 +1,23 @@
+- require_relative '../database.rb'
+
+!!! 5
+%html
+  %head
+    %title Level #{difficulty} checklist
+  %body
+    %table
+      %thead
+        %tr
+          %th Song
+          %th Difficulty
+          %th Result
+          %th Update Result
+      %tbody
+        - chart_data.each do |k, v|
+          %tr
+            %td= v[:song]
+            %td= v[:difficulty]
+            %td= get_result(k)
+            %td
+              - $result_map.each_with_index do |res, idx|
+                %a{ href: "/#{difficulty}/#{k}/#{idx}" }= res
