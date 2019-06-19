@@ -12,7 +12,7 @@ $DB = if ENV['RACK_ENV'] == 'production'
                                      host: 'localhost')
       end
 
-$DB.create_table $table_name do
+$DB.create_table? $table_name do
   primary_key :song_id
   Integer :result, null: false
   Integer :difficulty, null: false
