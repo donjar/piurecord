@@ -30,7 +30,7 @@ def process_response(resp)
 end
 
 def get_data(search_id, page)
-  params = { atVersion: '147', languageCode: 'en', display: 'CHART', page: page, rowsPerPage: '100', searchId: search_id }
+  params = { atVersion: '149', languageCode: 'en', display: 'CHART', page: page, rowsPerPage: '100', searchId: search_id }
 
   uri = $api_uri
   uri.query = URI.encode_www_form(params)
