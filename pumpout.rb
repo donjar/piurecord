@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'net/http'
 require 'net/https'
 require 'json'
@@ -17,11 +19,12 @@ $search_id = {
 }
 
 def process_response(resp)
-  Hash[resp["rows"].flat_map do |song|
+  Hash[resp['rows'].flat_map do |song|
     title = song['internalTitle']
     cut = song['cut']['internalTitle']
     song['charts'].map do |chart|
       next unless chart['inVersion']
+
       id = chart['chartId']
       mode = chart['rating']['mode']['internalAbbreviation']
       diff = chart['rating']['difficulty']['internalTitle']
@@ -31,19 +34,19 @@ def process_response(resp)
 end
 
 def get_data(search_id, page)
-  params = { atVersion: '152', languageCode: 'en', display: 'CHART', page: page, rowsPerPage: '100', searchId: search_id }
+  params = { atVersion: '152', languageCode: 'en', display: 'CHART', page: page,
+             rowsPerPage: '100', searchId: search_id }
 
   uri = $api_uri
   uri.query = URI.encode_www_form(params)
 
-  req = Net::HTTP::Get.new(uri.path)
-  res = Net::HTTP.start(
-          uri.host, uri.port, 
-          :use_ssl => uri.scheme == 'https', 
-          :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |https|
+  req = Net::HTTP::Get.new(uri)
+  res = Net::HTTP.start(uri.host, uri.port,
+                        use_ssl: uri.scheme == 'https',
+                        verify_mode: OpenSSL::SSL::VERIFY_NONE) do |https|
     https.request(req)
   end
-  resp = JSON.parse(res)
+  resp = JSON.parse(res.body)
   { data: process_response(resp), max_page: resp['info']['pagesFound'] }
 end
 
@@ -55,7 +58,7 @@ def get_all_data(search_id)
       all_data.merge!(res[:data])
       page + 1 < res[:max_page] ? page += 1 : break
     end
-  end.sort_by do |id, data|
+  end.sort_by do |_id, data|
     match = /^(.*) \((.*)\)$/.match(data[:song])
     [data[:difficulty], match[2], match[1]]
   end
