@@ -1,4 +1,5 @@
 require 'net/http'
+require 'net/https'
 require 'json'
 
 $api_uri = URI('https://pumpout2.anyhowstep.com:17593/api/search/result')
@@ -34,7 +35,15 @@ def get_data(search_id, page)
 
   uri = $api_uri
   uri.query = URI.encode_www_form(params)
-  resp = JSON.parse(Net::HTTP.get(uri))
+
+  req = Net::HTTP::Get.new(uri.path)
+  res = Net::HTTP.start(
+          uri.host, uri.port, 
+          :use_ssl => uri.scheme == 'https', 
+          :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |https|
+    https.request(req)
+  end
+  resp = JSON.parse(res)
   { data: process_response(resp), max_page: resp['info']['pagesFound'] }
 end
 
